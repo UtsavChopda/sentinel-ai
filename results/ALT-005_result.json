@@ -1,0 +1,27 @@
+{
+  "severity": "CRITICAL",
+  "confidence": 95,
+  "is_true_positive": true,
+  "title": "CVE-2021-44228 (Log4Shell) Exploit Detected",
+  "summary": "The internal Java Application Server is running an unpatched version of Log4j and has been targeted with the CVE-2021-44228 exploit. This vulnerability allows remote code execution, making it critical to apply the available patches immediately.",
+  "iocs": [
+    "91.109.182.3",
+    "ldap://91.109.189.3:1389/a"
+  ],
+  "mitre_techniques": [
+    "T1075 - Command and Scripting Interpreter",
+    "T1086 - PowerShell",
+    "T1102 - Remote Services"
+  ],
+  "investigation_steps": [
+    "Identify all services that use Log4j",
+    "Check the Log4j versions for each service",
+    "Apply patches for vulnerable versions",
+    "Audit logs to identify potential lateral movement or data exfiltration",
+    "Implement network and application-level controls to block further exploitation"
+  ],
+  "verdict": "Immediate action required: Unpatched Log4j server is under active attack.",
+  "alert_id": "ALT-005",
+  "source": "IDS/IPS",
+  "triaged_at": "2026-02-26T09:11:59.735139"
+}

@@ -1,0 +1,25 @@
+{
+  "severity": "CRITICAL",
+  "confidence": 97,
+  "is_true_positive": true,
+  "title": "Malware Scheduled Task Detected on DESKTOP-FIN02",
+  "summary": "An unsigned and malicious executable named svchost32.exe was detected as part of a scheduled task 'WindowsUpdate_Helper'. The file is flagged as dangerous by the majority (34/68) of antivirus engines, indicating high risk.",
+  "iocs": [
+    "C:\\Users\\Public\\svchost32.exe",
+    "WindowsUpdate_Helper"
+  ],
+  "mitre_techniques": [
+    "T1055 - Command and Scripting Interpreter",
+    "T1204 - User Execution"
+  ],
+  "investigation_steps": [
+    "Isolate the affected host immediately, block all outbound traffic",
+    "Analyze the scheduled task for any additional suspicious indicators",
+    "Download and scan the suspect file using multiple antivirus engines for confirmation",
+    "Inspect system logs for further activity related to this incident"
+  ],
+  "verdict": "Potential malware infection confirmed. Initiate immediate response actions.",
+  "alert_id": "ALT-006",
+  "source": "Endpoint EDR",
+  "triaged_at": "2026-02-26T09:12:08.473407"
+}

@@ -1,0 +1,25 @@
+{
+  "severity": "CRITICAL",
+  "confidence": 95,
+  "is_true_positive": true,
+  "title": "Potential Command and Control (C2) Activity",
+  "summary": "An outbound connection from host 10.0.1.45 to a known Tor exit node and C2 server at IP 185.220.101.47 over port 4444 for 12 minutes and transferring 2.3MB of data suggests potential command and control activity which can be indicative of a compromise.",
+  "iocs": [
+    "10.0.1.45",
+    "185.220.101.47",
+    "4444"
+  ],
+  "mitre_techniques": [
+    "T1055: Command and Control (C2) Communication - Inbound",
+    "T1056: Command and Control (C2) Communication - Outbound"
+  ],
+  "investigation_steps": [
+    "Thoroughly scan the host for malware, focusing on recently installed or modified files.",
+    "Inspect network traffic to determine if this is part of a larger pattern.",
+    "Check system logs for any anomalous activity related to the C2 IP."
+  ],
+  "verdict": "Immediate investigation and response required due to potential compromise",
+  "alert_id": "ALT-002",
+  "source": "Firewall",
+  "triaged_at": "2026-02-26T09:11:32.886595"
+}

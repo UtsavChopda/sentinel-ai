@@ -1,0 +1,26 @@
+{
+  "severity": "CRITICAL",
+  "confidence": 95,
+  "is_true_positive": true,
+  "title": "Impersonation of CEO Email Attempt with Urgent Wire Transfer Request",
+  "summary": "An email impersonating the CEO has been detected, requesting an urgent wire transfer of $85,000. The domain used in the email was registered only two days ago and multiple finance employees have been targeted.",
+  "iocs": [
+    "ceo-impersonation@newdomain.com",
+    "85000"
+  ],
+  "mitre_techniques": [
+    "T1192 - Email Spear Phishing: Account Compromise",
+    "T1078 - Initial Access: Phishing Link"
+  ],
+  "investigation_steps": [
+    "Investigate the email headers for additional information",
+    "Check if any wire transfers have been made",
+    "Verify the identity of the CEO",
+    "Check if the targeted finance employees have responded to the email",
+    "Isolate and analyze the new domain"
+  ],
+  "verdict": "Urgent action required to prevent potential financial loss",
+  "alert_id": "ALT-007",
+  "source": "Email Gateway",
+  "triaged_at": "2026-02-26T09:12:16.769265"
+}

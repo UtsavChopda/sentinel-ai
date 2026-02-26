@@ -1,0 +1,25 @@
+{
+  "severity": "CRITICAL",
+  "confidence": 95,
+  "is_true_positive": true,
+  "title": "Unauthorized Data Theft by Departing Employee",
+  "summary": "Mike Chen from Finance department downloaded 4.7GB of sensitive files and transferred them to personal cloud storage. This action is unusual as it occurred shortly after his resignation.",
+  "iocs": [
+    "mike.chen@example.com",
+    "personal_cloud_storage_ID"
+  ],
+  "mitre_techniques": [
+    "Exfiltration over Alternative Protocol (T1041)",
+    "Data Staged (T1567.002)"
+  ],
+  "investigation_steps": [
+    "Review downloaded files for sensitive data",
+    "Check if other users have accessed the same files recently",
+    "Investigate login activities from personal cloud storage",
+    "Interview Mike Chen about his actions"
+  ],
+  "verdict": "Immediate Data Breach Investigation Required",
+  "alert_id": "ALT-004",
+  "source": "CASB / DLP",
+  "triaged_at": "2026-02-26T09:11:50.035348"
+}

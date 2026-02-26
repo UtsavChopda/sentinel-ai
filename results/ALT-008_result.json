@@ -1,0 +1,26 @@
+{
+  "severity": "CRITICAL",
+  "confidence": 98,
+  "is_true_positive": true,
+  "title": "Ransomware Attack Detected",
+  "summary": "50,000 files have been encrypted within a short timeframe, shadow copies have been deleted, and a ransom note has been dropped. The high CPU usage indicates an encryption process, indicating a probable Ransomware attack.",
+  "iocs": [
+    "50000 encrypted files",
+    "deleted shadow copies",
+    "ransom note"
+  ],
+  "mitre_techniques": [
+    "Impact: Encrypt Data - T1486",
+    "Privilege Escalation: System level - T1073.002"
+  ],
+  "investigation_steps": [
+    "Inspect encrypted files for unique signatures",
+    "Analyze network traffic for C&C communication",
+    "Check system logs for account and privilege escalation activity",
+    "Recover deleted shadow copies"
+  ],
+  "verdict": "Ransomware attack confirmed. Immediate incident response is required.",
+  "alert_id": "ALT-008",
+  "source": "Endpoint EDR",
+  "triaged_at": "2026-02-26T09:12:24.962254"
+}

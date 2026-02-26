@@ -1,0 +1,240 @@
+{
+  "statistics": {
+    "CRITICAL": 7,
+    "HIGH": 1,
+    "MEDIUM": 1,
+    "LOW": 0,
+    "true_positive": 9,
+    "false_positive": 0
+  },
+  "total_alerts": 9,
+  "processed_at": "2026-02-26T09:12:34.500297",
+  "results": [
+    {
+      "severity": "HIGH",
+      "confidence": 85,
+      "is_true_positive": true,
+      "title": "Suspicious PowerShell Command Execution",
+      "summary": "A user (sarah.jones) on HOST DESKTOP-HR04 opened an email attachment 'invoice_march2026.docm' and triggered a process creation event, where cmd.exe was launched by WINWORD.EXE and executed an encoded PowerShell command. This behavior is suspicious due to the use of obfuscated commands which could potentially be malicious.",
+      "iocs": [
+        "invoice_march2026.docm",
+        "cmd.exe /c powershell -enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0AA=="
+      ],
+      "mitre_techniques": [
+        "T1059.001 - Command and Scripting Interpreter",
+        "T1102 - Ingress Tunnel"
+      ],
+      "investigation_steps": [
+        "Inspect the email metadata for signs of phishing or spoofing, Examine the contents of 'invoice_march2026.docm' for hidden macros or malicious code, Analyze network traffic for outbound connections from DESKTOP-HR04 to unusual destinations, Check the system for any suspicious files or registry entries"
+      ],
+      "verdict": "Investigate potential email phishing attempt and execute additional forensic analysis",
+      "alert_id": "ALT-001",
+      "source": "Endpoint EDR",
+      "triaged_at": "2026-02-26T09:11:23.102983"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "Potential Command and Control (C2) Activity",
+      "summary": "An outbound connection from host 10.0.1.45 to a known Tor exit node and C2 server at IP 185.220.101.47 over port 4444 for 12 minutes and transferring 2.3MB of data suggests potential command and control activity which can be indicative of a compromise.",
+      "iocs": [
+        "10.0.1.45",
+        "185.220.101.47",
+        "4444"
+      ],
+      "mitre_techniques": [
+        "T1055: Command and Control (C2) Communication - Inbound",
+        "T1056: Command and Control (C2) Communication - Outbound"
+      ],
+      "investigation_steps": [
+        "Thoroughly scan the host for malware, focusing on recently installed or modified files.",
+        "Inspect network traffic to determine if this is part of a larger pattern.",
+        "Check system logs for any anomalous activity related to the C2 IP."
+      ],
+      "verdict": "Immediate investigation and response required due to potential compromise",
+      "alert_id": "ALT-002",
+      "source": "Firewall",
+      "triaged_at": "2026-02-26T09:11:32.886595"
+    },
+    {
+      "severity": "MEDIUM",
+      "confidence": 75,
+      "is_true_positive": true,
+      "title": "Account Lockout Detected",
+      "summary": "John Smith's account has been locked out due to multiple unsuccessful login attempts within a minute from IP addresses 192.168.1.102, 192.168.1.103, and 192.168.1.104. This may indicate brute force attack or misconfiguration.",
+      "iocs": [
+        "192.168.1.102",
+        "192.168.1.103",
+        "192.168.1.104"
+      ],
+      "mitre_techniques": [
+        "Account Lockout Techniques (T1176)",
+        "Brute Force (T1110)"
+      ],
+      "investigation_steps": [
+        "Investigate IP addresses for potential malicious activity",
+        "Check if there are any unusual login attempts from these IPs",
+        "Verify if the account lockout is due to misconfiguration or a genuine attempt by user John Smith",
+        "Review password policies and consider strengthening them"
+      ],
+      "verdict": "Potential brute force attack or misconfiguration",
+      "alert_id": "ALT-003",
+      "source": "Active Directory",
+      "triaged_at": "2026-02-26T09:11:42.162585"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "Unauthorized Data Theft by Departing Employee",
+      "summary": "Mike Chen from Finance department downloaded 4.7GB of sensitive files and transferred them to personal cloud storage. This action is unusual as it occurred shortly after his resignation.",
+      "iocs": [
+        "mike.chen@example.com",
+        "personal_cloud_storage_ID"
+      ],
+      "mitre_techniques": [
+        "Exfiltration over Alternative Protocol (T1041)",
+        "Data Staged (T1567.002)"
+      ],
+      "investigation_steps": [
+        "Review downloaded files for sensitive data",
+        "Check if other users have accessed the same files recently",
+        "Investigate login activities from personal cloud storage",
+        "Interview Mike Chen about his actions"
+      ],
+      "verdict": "Immediate Data Breach Investigation Required",
+      "alert_id": "ALT-004",
+      "source": "CASB / DLP",
+      "triaged_at": "2026-02-26T09:11:50.035348"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "CVE-2021-44228 (Log4Shell) Exploit Detected",
+      "summary": "The internal Java Application Server is running an unpatched version of Log4j and has been targeted with the CVE-2021-44228 exploit. This vulnerability allows remote code execution, making it critical to apply the available patches immediately.",
+      "iocs": [
+        "91.109.182.3",
+        "ldap://91.109.189.3:1389/a"
+      ],
+      "mitre_techniques": [
+        "T1075 - Command and Scripting Interpreter",
+        "T1086 - PowerShell",
+        "T1102 - Remote Services"
+      ],
+      "investigation_steps": [
+        "Identify all services that use Log4j",
+        "Check the Log4j versions for each service",
+        "Apply patches for vulnerable versions",
+        "Audit logs to identify potential lateral movement or data exfiltration",
+        "Implement network and application-level controls to block further exploitation"
+      ],
+      "verdict": "Immediate action required: Unpatched Log4j server is under active attack.",
+      "alert_id": "ALT-005",
+      "source": "IDS/IPS",
+      "triaged_at": "2026-02-26T09:11:59.735139"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 97,
+      "is_true_positive": true,
+      "title": "Malware Scheduled Task Detected on DESKTOP-FIN02",
+      "summary": "An unsigned and malicious executable named svchost32.exe was detected as part of a scheduled task 'WindowsUpdate_Helper'. The file is flagged as dangerous by the majority (34/68) of antivirus engines, indicating high risk.",
+      "iocs": [
+        "C:\\Users\\Public\\svchost32.exe",
+        "WindowsUpdate_Helper"
+      ],
+      "mitre_techniques": [
+        "T1055 - Command and Scripting Interpreter",
+        "T1204 - User Execution"
+      ],
+      "investigation_steps": [
+        "Isolate the affected host immediately, block all outbound traffic",
+        "Analyze the scheduled task for any additional suspicious indicators",
+        "Download and scan the suspect file using multiple antivirus engines for confirmation",
+        "Inspect system logs for further activity related to this incident"
+      ],
+      "verdict": "Potential malware infection confirmed. Initiate immediate response actions.",
+      "alert_id": "ALT-006",
+      "source": "Endpoint EDR",
+      "triaged_at": "2026-02-26T09:12:08.473407"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "Impersonation of CEO Email Attempt with Urgent Wire Transfer Request",
+      "summary": "An email impersonating the CEO has been detected, requesting an urgent wire transfer of $85,000. The domain used in the email was registered only two days ago and multiple finance employees have been targeted.",
+      "iocs": [
+        "ceo-impersonation@newdomain.com",
+        "85000"
+      ],
+      "mitre_techniques": [
+        "T1192 - Email Spear Phishing: Account Compromise",
+        "T1078 - Initial Access: Phishing Link"
+      ],
+      "investigation_steps": [
+        "Investigate the email headers for additional information",
+        "Check if any wire transfers have been made",
+        "Verify the identity of the CEO",
+        "Check if the targeted finance employees have responded to the email",
+        "Isolate and analyze the new domain"
+      ],
+      "verdict": "Urgent action required to prevent potential financial loss",
+      "alert_id": "ALT-007",
+      "source": "Email Gateway",
+      "triaged_at": "2026-02-26T09:12:16.769265"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 98,
+      "is_true_positive": true,
+      "title": "Ransomware Attack Detected",
+      "summary": "50,000 files have been encrypted within a short timeframe, shadow copies have been deleted, and a ransom note has been dropped. The high CPU usage indicates an encryption process, indicating a probable Ransomware attack.",
+      "iocs": [
+        "50000 encrypted files",
+        "deleted shadow copies",
+        "ransom note"
+      ],
+      "mitre_techniques": [
+        "Impact: Encrypt Data - T1486",
+        "Privilege Escalation: System level - T1073.002"
+      ],
+      "investigation_steps": [
+        "Inspect encrypted files for unique signatures",
+        "Analyze network traffic for C&C communication",
+        "Check system logs for account and privilege escalation activity",
+        "Recover deleted shadow copies"
+      ],
+      "verdict": "Ransomware attack confirmed. Immediate incident response is required.",
+      "alert_id": "ALT-008",
+      "source": "Endpoint EDR",
+      "triaged_at": "2026-02-26T09:12:24.962254"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 80,
+      "is_true_positive": true,
+      "title": "Potential Unauthorized Access Attempt",
+      "summary": "Alex Kumar accessed multiple password reset pages. This indicates a possible brute-force attack or credential stuffing attempt, bypassing security measures. The access to admin AWS without a helpdesk ticket for a password issue is concerning.",
+      "iocs": [
+        "14 password reset URLs accessed by 'alex.kumar'"
+      ],
+      "mitre_techniques": [
+        "T1591.001 - Brute Force",
+        "T1078.001 - Initial Access"
+      ],
+      "investigation_steps": [
+        "Investigate the origin of the login attempts, check for any unusual activity patterns.",
+        "Review AWS logs for any unauthorized actions.",
+        "Check if multi-factor authentication (MFA) was enabled during this event.",
+        "Inspect system logs for signs of credential stuffing or brute force attacks."
+      ],
+      "verdict": "Immediate investigation required to secure the system and prevent potential data breach",
+      "alert_id": "ALT-009",
+      "source": "Web Proxy",
+      "triaged_at": "2026-02-26T09:12:33.498374"
+    }
+  ]
+}

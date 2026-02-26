@@ -1,0 +1,248 @@
+{
+  "statistics": {
+    "CRITICAL": 7,
+    "HIGH": 1,
+    "MEDIUM": 1,
+    "LOW": 0,
+    "true_positive": 9,
+    "false_positive": 0
+  },
+  "total_alerts": 9,
+  "processed_at": "2026-02-26T08:11:58.825574",
+  "results": [
+    {
+      "severity": "HIGH",
+      "confidence": 85,
+      "is_true_positive": true,
+      "title": "Suspected PowerShell Execution via Microsoft Word Document",
+      "summary": "An uncommon event occurred where a user (sarah.jones) opened an attachment (invoice_march2026.docm), leading to the execution of PowerShell commands. This behavior is unusual and raises concerns as such activities can potentially lead to malware infections or data breaches.",
+      "iocs": [
+        "desktop-hr04",
+        "sarah.jones",
+        "invoice_march2026.docm",
+        "cmd.exe",
+        "powershell"
+      ],
+      "mitre_techniques": [
+        "T1059 - Command and Scripting Interpreter",
+        "T1192 - Exploitation for Client Execution"
+      ],
+      "investigation_steps": [
+        "Inspect the contents of the attachment for any malicious content or macros",
+        "Analyze network traffic for any unusual outbound connections",
+        "Review system logs for related events in the last 48 hours",
+        "Isolate the host (DESKTOP-HR04) for further investigation"
+      ],
+      "verdict": "Investigate potential malicious activity; take immediate action to secure the affected system",
+      "alert_id": "ALT-001",
+      "source": "Endpoint EDR",
+      "triaged_at": "2026-02-26T08:10:45.073872"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "Potential Command and Control (C&C) Communication",
+      "summary": "An outbound connection from the host 10.0.1.45 was blocked to a known Tor exit node and C2 server at IP 185.220.101.47 on port 4444 for 12 minutes, transferring 2.3MB of data. This could indicate an attempt to communicate with a malicious actor.",
+      "iocs": [
+        "10.0.1.45",
+        "185.220.101.47",
+        "4444"
+      ],
+      "mitre_techniques": [
+        "T1071 - Command and Control",
+        "T1041 - Remote Desktop Protocol"
+      ],
+      "investigation_steps": [
+        "Inspect the process that initiated the connection for malicious behavior or unknown software",
+        "Analyze network traffic patterns around the time of the alert to identify unusual activity",
+        "Check logs for any other related connections or suspicious events",
+        "Scan the host for known malware signatures and indicators of compromise"
+      ],
+      "verdict": "Investigate further as this could be an attempt at a compromised system communicating with a C&C server.",
+      "alert_id": "ALT-002",
+      "source": "Firewall",
+      "triaged_at": "2026-02-26T08:10:54.777561"
+    },
+    {
+      "severity": "MEDIUM",
+      "confidence": 75,
+      "is_true_positive": true,
+      "title": "Account Lockout Detected",
+      "summary": "A user (john.smith) has exceeded the maximum number of failed login attempts within a minute from multiple IP addresses (192.168.1.102, 192.168.1.103, 192.168.1.104). This may indicate a brute force attack or an attempt to guess the password.",
+      "iocs": [
+        "192.168.1.102",
+        "192.168.1.103",
+        "192.168.1.104"
+      ],
+      "mitre_techniques": [
+        "Brute Force (T1110)",
+        "Credential Dumping (T1075)"
+      ],
+      "investigation_steps": [
+        "Inspect login logs for more attempts",
+        "Check if a password spray or brute force attack is in progress",
+        "Analyze the compromised account's permissions and recent activity",
+        "Investigate any unusual network traffic from the involved IP addresses",
+        "Reset the user's password"
+      ],
+      "verdict": "Potential account compromise, initiate password reset and further investigation.",
+      "alert_id": "ALT-003",
+      "source": "Active Directory",
+      "triaged_at": "2026-02-26T08:11:04.113025"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "Unauthorized Data Exfiltration by Departing Employee",
+      "summary": "The user mike.chen from the Finance department has downloaded an unusual amount of data (4.7GB in 8 minutes) and transferred sensitive files to personal cloud storage. This activity is highly suspicious, especially given that the user submitted a resignation yesterday.",
+      "iocs": [
+        "mike.chen",
+        "personal cloud storage account ID"
+      ],
+      "mitre_techniques": [
+        "Exfiltration over Removable Media - T1041",
+        "Data from Local System - T1005"
+      ],
+      "investigation_steps": [
+        "Review the logs for any other suspicious activities by mike.chen prior to his resignation.",
+        "Investigate the content of the downloaded files.",
+        "Secure the personal cloud storage account.",
+        "Notify the IT department to revoke mike.chen's access credentials."
+      ],
+      "verdict": "Potential data breach by departing employee. Investigate immediately and take appropriate actions.",
+      "alert_id": "ALT-004",
+      "source": "CASB / DLP",
+      "triaged_at": "2026-02-26T08:11:12.576589"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "CVE-2021-44228 (Log4Shell) Exploitation Detected",
+      "summary": "An exploit for the Log4Shell vulnerability (CVE-2021-44228) was detected on an internal Java Application Server running an unpatched version of Log4j. The server is being targeted by a payload using ldap protocol, which could lead to remote code execution.",
+      "iocs": [
+        "91.109.182.3:1389"
+      ],
+      "mitre_techniques": [
+        "T1070 - Command and Control",
+        "T1589.002 - Remote Services Technical Preparation"
+      ],
+      "investigation_steps": [
+        "Identify the specific Java application affected by the vulnerability",
+        "Check logs for any signs of further exploitation or data exfiltration",
+        "Implement temporary mitigations while patching is being performed",
+        "Apply the appropriate Log4j patch for the affected version",
+        "Review and update incident response plan to handle future Log4Shell incidents"
+      ],
+      "verdict": "Unpatched Log4j server under active attack, urgent action required to patch and mitigate",
+      "alert_id": "ALT-005",
+      "source": "IDS/IPS",
+      "triaged_at": "2026-02-26T08:11:22.020170"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 97,
+      "is_true_positive": true,
+      "title": "Unsigned Malware Executable Created on DESKTOP-FIN02",
+      "summary": "An unsigned executable named 'svchost32.exe' was created in the public directory of HOST: DESKTOP-FIN02 via a scheduled task named 'WindowsUpdate_Helper'. The file has been flagged as malicious by 34 out of 68 antivirus engines, indicating a high likelihood of a security compromise.",
+      "iocs": [
+        "C:\\Users\\Public\\svchost32.exe"
+      ],
+      "mitre_techniques": [
+        "T1055.007 - Scheduled Task/Job",
+        "T1204 - File and Directory Discovery"
+      ],
+      "investigation_steps": [
+        "Check for signs of lateral movement within the network, such as unusual file access or network traffic.",
+        "Extract and analyze the contents of the scheduled task to determine its purpose.",
+        "Run additional antivirus scans on the affected host.",
+        "Investigate the user account that created the scheduled task."
+      ],
+      "verdict": "Immediate response required: Potential malware infection detected on DESKTOP-FIN02",
+      "alert_id": "ALT-006",
+      "source": "Endpoint EDR",
+      "triaged_at": "2026-02-26T08:11:31.513493"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 95,
+      "is_true_positive": true,
+      "title": "CEO Impersonation Phishing Attempt Detected",
+      "summary": "An email impersonating the CEO was detected, requesting an urgent wire transfer of $85,000. The domain associated with the email is only two days old and has been targeted towards multiple finance employees.",
+      "iocs": [
+        "ceo@new-domain.com",
+        "new-domain.com"
+      ],
+      "mitre_techniques": [
+        "T1192 - Email Spearphishing: Attachment",
+        "T1566.002 - Valid Accounts: Corporate Account Use"
+      ],
+      "investigation_steps": [
+        "Inspect the email headers for further information",
+        "Review the targeted employees' email activity logs",
+        "Check if any wire transfers were initiated from the identified accounts",
+        "Research the new domain for potential malicious activities",
+        "Alert other employees about the phishing attempt"
+      ],
+      "verdict": "Urgent: Wire transfer action should be halted immediately",
+      "alert_id": "ALT-007",
+      "source": "Email Gateway",
+      "triaged_at": "2026-02-26T08:11:40.027848"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 98,
+      "is_true_positive": true,
+      "title": "Possible Ransomware Attack on SERVER-PROD-01",
+      "summary": "A large number of files have been encrypted in a short period of time, shadow copies have been deleted, and a ransom note has been dropped. A high CPU process associated with encryption was also detected.",
+      "iocs": [
+        "50,000 encrypted files",
+        "deleted shadow copies",
+        "ransom note"
+      ],
+      "mitre_techniques": [
+        "Impact: Data Encrypted \u2014 T1486",
+        "Initial Access: Phishing Attachment \u2014 T1192",
+        "Data Stolen for Further Exploitation, Exfiltration Over Command-and-Control Channel \u2014 T1041"
+      ],
+      "investigation_steps": [
+        "Investigate the origin of the ransomware",
+        "Recover encrypted files from backups if available",
+        "Analyze network traffic for additional compromised hosts",
+        "Check email logs for phishing attempts",
+        "Isolate and forensically analyze SERVER-PROD-01"
+      ],
+      "verdict": "Immediate action required to contain the ransomware and recover data.",
+      "alert_id": "ALT-008",
+      "source": "Endpoint EDR",
+      "triaged_at": "2026-02-26T08:11:49.268889"
+    },
+    {
+      "severity": "CRITICAL",
+      "confidence": 90,
+      "is_true_positive": true,
+      "title": "Unauthorized Access Attempt - Password Reset and Admin AWS",
+      "summary": "Alex Kumar accessed multiple password reset pages, which is unusual and may indicate a brute-force attack or compromised account. Additionally, access to admin level AWS resources was detected without a corresponding helpdesk ticket for a password issue.",
+      "iocs": [
+        "alex.kumar",
+        "password reset pages"
+      ],
+      "mitre_techniques": [
+        "T1591.002 - Brute Force",
+        "T1078 - Network Service Scanning"
+      ],
+      "investigation_steps": [
+        "Review user account activity logs for unusual behavior, check for any successful login attempts or data exfiltration.",
+        "Investigate the network traffic and identify any potential sources of the attack.",
+        "Check for any multi-factor authentication settings and enforce them if not already in place.",
+        "Review password policies and consider implementing password rotation and complex password requirements."
+      ],
+      "verdict": "Immediate investigation required to mitigate potential unauthorized access.",
+      "alert_id": "ALT-009",
+      "source": "Web Proxy",
+      "triaged_at": "2026-02-26T08:11:57.822726"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "severity": "CRITICAL",
+  "confidence": 80,
+  "is_true_positive": true,
+  "title": "Potential Unauthorized Access Attempt",
+  "summary": "Alex Kumar accessed multiple password reset pages. This indicates a possible brute-force attack or credential stuffing attempt, bypassing security measures. The access to admin AWS without a helpdesk ticket for a password issue is concerning.",
+  "iocs": [
+    "14 password reset URLs accessed by 'alex.kumar'"
+  ],
+  "mitre_techniques": [
+    "T1591.001 - Brute Force",
+    "T1078.001 - Initial Access"
+  ],
+  "investigation_steps": [
+    "Investigate the origin of the login attempts, check for any unusual activity patterns.",
+    "Review AWS logs for any unauthorized actions.",
+    "Check if multi-factor authentication (MFA) was enabled during this event.",
+    "Inspect system logs for signs of credential stuffing or brute force attacks."
+  ],
+  "verdict": "Immediate investigation required to secure the system and prevent potential data breach",
+  "alert_id": "ALT-009",
+  "source": "Web Proxy",
+  "triaged_at": "2026-02-26T09:12:33.498374"
+}

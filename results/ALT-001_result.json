@@ -1,0 +1,22 @@
+{
+  "severity": "HIGH",
+  "confidence": 85,
+  "is_true_positive": true,
+  "title": "Suspicious PowerShell Command Execution",
+  "summary": "A user (sarah.jones) on HOST DESKTOP-HR04 opened an email attachment 'invoice_march2026.docm' and triggered a process creation event, where cmd.exe was launched by WINWORD.EXE and executed an encoded PowerShell command. This behavior is suspicious due to the use of obfuscated commands which could potentially be malicious.",
+  "iocs": [
+    "invoice_march2026.docm",
+    "cmd.exe /c powershell -enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0AA=="
+  ],
+  "mitre_techniques": [
+    "T1059.001 - Command and Scripting Interpreter",
+    "T1102 - Ingress Tunnel"
+  ],
+  "investigation_steps": [
+    "Inspect the email metadata for signs of phishing or spoofing, Examine the contents of 'invoice_march2026.docm' for hidden macros or malicious code, Analyze network traffic for outbound connections from DESKTOP-HR04 to unusual destinations, Check the system for any suspicious files or registry entries"
+  ],
+  "verdict": "Investigate potential email phishing attempt and execute additional forensic analysis",
+  "alert_id": "ALT-001",
+  "source": "Endpoint EDR",
+  "triaged_at": "2026-02-26T09:11:23.102983"
+}

@@ -1,0 +1,26 @@
+{
+  "severity": "MEDIUM",
+  "confidence": 75,
+  "is_true_positive": true,
+  "title": "Account Lockout Detected",
+  "summary": "John Smith's account has been locked out due to multiple unsuccessful login attempts within a minute from IP addresses 192.168.1.102, 192.168.1.103, and 192.168.1.104. This may indicate brute force attack or misconfiguration.",
+  "iocs": [
+    "192.168.1.102",
+    "192.168.1.103",
+    "192.168.1.104"
+  ],
+  "mitre_techniques": [
+    "Account Lockout Techniques (T1176)",
+    "Brute Force (T1110)"
+  ],
+  "investigation_steps": [
+    "Investigate IP addresses for potential malicious activity",
+    "Check if there are any unusual login attempts from these IPs",
+    "Verify if the account lockout is due to misconfiguration or a genuine attempt by user John Smith",
+    "Review password policies and consider strengthening them"
+  ],
+  "verdict": "Potential brute force attack or misconfiguration",
+  "alert_id": "ALT-003",
+  "source": "Active Directory",
+  "triaged_at": "2026-02-26T09:11:42.162585"
+}

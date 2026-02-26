@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENTINEL//AI — SOC Triage Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg:       #07070f;
+    --bg2:      #0d0d1a;
+    --bg3:      #111122;
+    --border:   #1a1a2e;
+    --text:     #8892b0;
+    --bright:   #ccd6f6;
+    --blue:     #0a84ff;
+    --green:    #30d158;
+    --orange:   #ff9500;
+    --red:      #ff2d55;
+    --purple:   #bf5af2;
+    --yellow:   #ffd60a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--border); }
+
+  @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes fadeIn  { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes glow    { 0%,100%{box-shadow:0 0 8px #ff2d5530} 50%{box-shadow:0 0 20px #ff2d5560} }
+  @keyframes spin    { to{transform:rotate(360deg)} }
+  @keyframes slideIn { from{transform:translateX(-8px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px; border-bottom: 1px solid var(--border);
+    background: rgba(7,7,15,0.95); backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 14px; }
+  .logo-icon { width: 38px; height: 38px; border: 2px solid var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(10,132,255,0.08); position: relative; }
+  .logo-dot { position: absolute; top: -4px; right: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--green); border: 2px solid var(--bg); animation: pulse 2s infinite; }
+  .logo-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 9px; color: #334; letter-spacing: 2px; margin-top: 2px; }
+
+  .header-stats { display: flex; gap: 28px; align-items: center; }
+  .stat-item { text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 9px; color: #445; letter-spacing: 1.5px; margin-top: 3px; }
+
+  .status-pill { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 11px; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  .main { display: grid; grid-template-columns: 340px 1fr; height: calc(100vh - 65px); }
+
+  .left-panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .panel-title { font-size: 10px; letter-spacing: 2px; color: #445; }
+
+  .alert-list { overflow-y: auto; flex: 1; }
+  .alert-item {
+    padding: 13px 16px; border-bottom: 1px solid #0a0a14;
+    cursor: pointer; transition: all 0.15s;
+    border-left: 2px solid transparent;
+    animation: slideIn 0.3s ease;
+  }
+  .alert-item:hover { background: rgba(255,255,255,0.02); }
+  .alert-item.active { background: rgba(10,132,255,0.06); border-left-color: var(--blue) !important; }
+  .alert-item.CRITICAL { border-left-color: var(--red); }
+  .alert-item.HIGH     { border-left-color: var(--orange); }
+  .alert-item.MEDIUM   { border-left-color: var(--yellow); }
+  .alert-item.LOW      { border-left-color: var(--green); }
+
+  .alert-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .alert-id { font-size: 11px; color: var(--blue); font-weight: 600; }
+  .alert-title-text { font-size: 11px; color: var(--text); line-height: 1.4; margin-bottom: 7px; }
+
+  .badge { padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+  .badge.CRITICAL { background: rgba(255,45,85,0.15);  color: var(--red);    border: 1px solid rgba(255,45,85,0.3);    animation: glow 2s infinite; }
+  .badge.HIGH     { background: rgba(255,149,0,0.12);  color: var(--orange); border: 1px solid rgba(255,149,0,0.3); }
+  .badge.MEDIUM   { background: rgba(255,214,10,0.1);  color: var(--yellow); border: 1px solid rgba(255,214,10,0.3); }
+  .badge.LOW      { background: rgba(48,209,88,0.1);   color: var(--green);  border: 1px solid rgba(48,209,88,0.25); }
+
+  .conf-bar { display: flex; align-items: center; gap: 8px; }
+  .conf-track { flex: 1; height: 3px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+  .conf-val { font-size: 11px; font-weight: 700; min-width: 32px; }
+
+  .right-panel { overflow-y: auto; }
+  .detail-view { padding: 28px 32px; }
+
+  .detail-header { margin-bottom: 24px; }
+  .detail-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .detail-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 12px; }
+  .verdict-box { padding: 10px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+  .full-width { grid-column: 1 / -1; }
+
+  .card { padding: 18px 20px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; }
+  .card-title { font-size: 10px; letter-spacing: 2px; margin-bottom: 14px; font-weight: 600; }
+
+  .ioc-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+  .mitre-tag { padding: 5px 10px; border-radius: 4px; font-size: 11px; margin-bottom: 6px; font-family: monospace; }
+
+  .step-item { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid #0a0a14; }
+  .step-item:last-child { border-bottom: none; }
+  .step-num { min-width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .step-text { font-size: 12px; line-height: 1.6; color: var(--text); }
+
+  .raw-box { padding: 14px 18px; background: #040409; border: 1px solid var(--border); border-radius: 8px; }
+  .raw-title { font-size: 10px; color: #334; letter-spacing: 2px; margin-bottom: 8px; }
+  .raw-text { font-size: 11px; color: #445; line-height: 1.7; white-space: pre-wrap; word-break: break-all; }
+
+  .input-section { padding: 14px 16px; border-top: 1px solid var(--border); background: var(--bg2); }
+  .input-title { font-size: 9px; color: #334; letter-spacing: 2px; margin-bottom: 8px; }
+  .alert-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--bright); padding: 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; resize: none; outline: none; height: 80px; }
+  .alert-textarea:focus { border-color: var(--blue); }
+  .triage-btn { width: 100%; margin-top: 8px; padding: 10px; background: var(--blue); color: #fff; border: none; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
+  .triage-btn:hover { background: #0070e0; }
+  .triage-btn:disabled { background: #1a1a2e; color: #445; cursor: not-allowed; }
+  .spinner { width: 14px; height: 14px; border: 2px solid #334; border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .refresh-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; font-family: monospace; font-size: 10px; cursor: pointer; transition: all 0.2s; }
+  .refresh-btn:hover { border-color: var(--blue); color: var(--blue); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">
+      <div class="logo-dot"></div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-title">SENTINEL<span style="color:#0a84ff">//AI</span></div>
+      <div class="logo-sub">LLM-POWERED SOC ALERT TRIAGE ENGINE</div>
+    </div>
+  </div>
+
+  <div class="header-stats">
+    <div class="stat-item"><div class="stat-val" id="stat-total" style="color:#ccd6f6">0</div><div class="stat-label">TOTAL</div></div>
+    <div class="stat-item"><div class="stat-val" id="stat-critical" style="color:#ff2d55">0</div><div class="stat-label">CRITICAL</div></div>
+    <div class="stat-item"><div class="stat-val" id="stat-high" style="color:#ff9500">0</div><div class="stat-label">HIGH</div></div>
+    <div class="stat-item"><div class="stat-val" id="stat-tp" style="color:#30d158">0</div><div class="stat-label">TRUE POS</div></div>
+    <div class="stat-item"><div class="stat-val" id="stat-fp" style="color:#0a84ff">0</div><div class="stat-label">FALSE POS</div></div>
+  </div>
+
+  <div class="status-pill">
+    <div class="status-dot" id="status-dot" style="background:#ffd60a"></div>
+    <span id="status-text">Connecting...</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+    <div class="panel-header">
+      <span class="panel-title">TRIAGED ALERTS</span>
+      <button class="refresh-btn" onclick="loadResults()">↺ REFRESH</button>
+    </div>
+
+    <div class="alert-list" id="alert-list">
+      <div style="padding:40px 16px;text-align:center;color:#334;font-size:12px;">Loading alerts...</div>
+    </div>
+
+    <div class="input-section">
+      <div class="input-title">SUBMIT NEW ALERT FOR TRIAGE</div>
+      <textarea class="alert-textarea" id="alert-input" placeholder="Paste raw alert text here...&#10;e.g. ALERT SOURCE: EDR&#10;HOST: DESKTOP-01&#10;Suspicious process detected..."></textarea>
+      <button class="triage-btn" id="triage-btn" onclick="submitAlert()">▸ TRIAGE WITH AI</button>
+    </div>
+  </div>
+
+  <div class="right-panel" id="right-panel">
+    <div style="height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+      <div style="width:56px;height:56px;border:2px solid #1a1a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e2040" stroke-width="1.5">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </div>
+      <div style="font-size:13px;color:#334;">Select an alert to view AI triage analysis</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "http://localhost:8000";
+let allResults = [];
+let selectedId = null;
+
+const SEV = {
+  CRITICAL: { color:"#ff2d55", bg:"rgba(255,45,85,0.12)",  border:"rgba(255,45,85,0.35)"  },
+  HIGH:     { color:"#ff9500", bg:"rgba(255,149,0,0.1)",   border:"rgba(255,149,0,0.3)"   },
+  MEDIUM:   { color:"#ffd60a", bg:"rgba(255,214,10,0.08)", border:"rgba(255,214,10,0.28)" },
+  LOW:      { color:"#30d158", bg:"rgba(48,209,88,0.08)",  border:"rgba(48,209,88,0.25)"  },
+};
+
+function sevColor(s) { return SEV[s]?.color || "#8892b0"; }
+
+async function checkHealth() {
+  try {
+    const r = await fetch(`${API}/health`);
+    const d = await r.json();
+    const ollama = d.ollama === "online";
+    document.getElementById("status-dot").style.background = ollama ? "#30d158" : "#ff9500";
+    document.getElementById("status-text").textContent = ollama ? "ONLINE — LLM READY" : "API UP — OLLAMA OFFLINE";
+  } catch {
+    document.getElementById("status-dot").style.background = "#ff2d55";
+    document.getElementById("status-text").textContent = "API OFFLINE";
+  }
+}
+
+async function loadResults() {
+  try {
+    const r = await fetch(`${API}/results`);
+    const d = await r.json();
+    allResults = d.results || [];
+    renderAlertList();
+    loadStats();
+  } catch {
+    document.getElementById("alert-list").innerHTML =
+      `<div style="padding:20px;color:#ff2d55;font-size:11px;">Cannot reach API.<br>Make sure server is running:<br><br>python -m uvicorn api:app --reload --port 8000</div>`;
+  }
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/stats`);
+    const d = await r.json();
+    document.getElementById("stat-total").textContent    = d.total || 0;
+    document.getElementById("stat-critical").textContent = d.CRITICAL || 0;
+    document.getElementById("stat-high").textContent     = d.HIGH || 0;
+    document.getElementById("stat-tp").textContent       = d.true_positive || 0;
+    document.getElementById("stat-fp").textContent       = d.false_positive || 0;
+  } catch {}
+}
+
+function renderAlertList() {
+  const list = document.getElementById("alert-list");
+  if (!allResults.length) {
+    list.innerHTML = `<div style="padding:40px 16px;text-align:center;color:#334;font-size:12px;">No triaged alerts yet.<br>Submit an alert below.</div>`;
+    return;
+  }
+  list.innerHTML = allResults.map(r => {
+    const sev   = r.severity || "LOW";
+    const conf  = r.confidence || 0;
+    const color = sevColor(sev);
+    const active = selectedId === r.alert_id ? "active" : "";
+    return `
+    <div class="alert-item ${sev} ${active}" onclick="selectAlert('${r.alert_id}')">
+      <div class="alert-top">
+        <span class="alert-id">${r.alert_id}</span>
+        <span class="badge ${sev}">${sev}</span>
+      </div>
+      <div class="alert-title-text">${(r.title||"").substring(0,58)}${(r.title||"").length>58?"...":""}</div>
+      <div class="conf-bar">
+        <div class="conf-track"><div class="conf-fill" style="width:${conf}%;background:${color}"></div></div>
+        <span class="conf-val" style="color:${color}">${conf}%</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function selectAlert(id) {
+  selectedId = id;
+  renderAlertList();
+  const r = allResults.find(x => x.alert_id === id);
+  if (!r) return;
+
+  const sev = r.severity || "LOW";
+  const s   = SEV[sev] || SEV.LOW;
+  const color = s.color;
+
+  const iocs = (r.iocs || []).map(i =>
+    `<div class="ioc-item"><span style="color:${color};margin-top:3px;flex-shrink:0">◆</span><span style="color:#ccd6f6;font-size:12px">${i}</span></div>`
+  ).join("") || '<div style="color:#334;font-size:12px">None identified</div>';
+
+  const mitre = (r.mitre_techniques || []).map(m =>
+    `<div class="mitre-tag" style="background:rgba(191,90,242,0.08);border:1px solid rgba(191,90,242,0.2);color:#bf5af2">${m}</div>`
+  ).join("") || '<div style="color:#334;font-size:12px">None mapped</div>';
+
+  const steps = (r.investigation_steps || []).map((step, i) =>
+    `<div class="step-item">
+      <div class="step-num" style="background:rgba(48,209,88,0.1);border:1px solid rgba(48,209,88,0.2);color:#30d158">${i+1}</div>
+      <div class="step-text">${step}</div>
+    </div>`
+  ).join("") || '<div style="color:#334;font-size:12px">No steps generated</div>';
+
+  document.getElementById("right-panel").innerHTML = `
+  <div class="detail-view">
+    <div class="detail-header">
+      <div class="detail-meta">
+        <span class="badge ${sev}">${sev}</span>
+        <span style="font-size:11px;color:#0a84ff">${r.alert_id}</span>
+        <span style="font-size:11px;color:#445">•</span>
+        <span style="font-size:11px;color:#445">${r.source || ""}</span>
+        <span style="font-size:11px;color:#445">•</span>
+        <span style="font-size:11px;color:#0a84ff">Confidence: ${r.confidence}%</span>
+      </div>
+      <div class="detail-title">${r.title || ""}</div>
+      <div class="verdict-box" style="background:${s.bg};border:1px solid ${s.border};color:${color}">
+        ${r.is_true_positive ? "⚠" : "✓"} ${r.verdict || ""}
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card full-width" style="background:rgba(10,132,255,0.05);border-color:rgba(10,132,255,0.15)">
+        <div class="card-title" style="color:#0a84ff">⬡ LLM ANALYSIS</div>
+        <p style="font-size:13px;line-height:1.8;color:#8892b0">${r.summary || ""}</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="color:#ff9500">INDICATORS OF COMPROMISE</div>
+        ${iocs}
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="color:#bf5af2">MITRE ATT&CK MAPPING</div>
+        ${mitre}
+      </div>
+
+      <div class="card full-width">
+        <div class="card-title" style="color:#30d158">AI-GENERATED INVESTIGATION PLAYBOOK</div>
+        ${steps}
+      </div>
+
+      <div class="raw-box full-width">
+        <div class="raw-title">RAW ALERT DATA</div>
+        <div class="raw-text">${(r.raw_alert || "").trim()}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function submitAlert() {
+  const text = document.getElementById("alert-input").value.trim();
+  if (!text) { alert("Please paste an alert first."); return; }
+
+  const btn = document.getElementById("triage-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> AI IS THINKING...';
+
+  try {
+    const r = await fetch(`${API}/triage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        alert_id: `ALT-${Date.now()}`,
+        source: "Manual Input",
+        raw_alert: text
+      })
+    });
+    const result = await r.json();
+    allResults.unshift(result);
+    renderAlertList();
+    loadStats();
+    selectAlert(result.alert_id);
+    document.getElementById("alert-input").value = "";
+  } catch(e) {
+    alert("Error: " + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "▸ TRIAGE WITH AI";
+  }
+}
+
+setInterval(() => { checkHealth(); loadResults(); }, 30000);
+checkHealth();
+loadResults();
+</script>
+</body>
+</html>
