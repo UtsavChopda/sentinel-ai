@@ -325,12 +325,14 @@ SENTINEL//AI runs entirely locally. No alert data, no results, and no sensitive 
 Built as a real-world cybersecurity portfolio project to address alert fatigue — the #1 problem in SOC operations globally.
 
 **Connect with me:**
-- LinkedIn: [Your LinkedIn]
-- GitHub: [Your GitHub]
+- LinkedIn: [https://www.linkedin.com/in/utsavchopda/]
+- GitHub: [https://github.com/UtsavChopda]
 
 ---
 
 ## 📄 License
+
+## Output <img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/8167259d-0608-494c-b073-1a7d45d15ae5" />
 
 MIT License — free to use, modify, and distribute.
 
